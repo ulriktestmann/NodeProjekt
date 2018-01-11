@@ -30,6 +30,7 @@ app.get('/', function(req, res){
 io.on('connection', function(socket){
 
  var username = null;
+ io.emit("userlist push", userNameArray);
 
 
 
@@ -140,7 +141,7 @@ io.on('connection', function(socket){
   	//looping through userarray to remove user
     var array = userNameArray;
       for (var i = array.length - 1; i >= 0; --i) {
-        if (array[i] == userIP) {
+        if (array[i] == username) {
          array.splice(i,1);
         }
       }
@@ -151,7 +152,7 @@ io.on('connection', function(socket){
 
     //push userlist on client request
     socket.on("userlist request", function(){
-      io.emit("userlist push", userArray);
+      io.emit("userlist push", userNameArray);
       console.log("client request approved");
     });
 
