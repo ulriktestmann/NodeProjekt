@@ -78,6 +78,7 @@
       $(function () {
 
         var socket = io();
+        var msgReceived = false;
         
 
         $('form').submit(function(){
@@ -85,11 +86,13 @@
           $('#m').val(''); return false;
         });
 
+
         socket.on('chat message', function(msg){
           $('#messages').append($('<li>').text(msg));
           window.scrollTo(0, document.body.scrollHeight);
         });
 
+        //userlist update
         socket.on("userlist push", function(list){
             $("#ulist").empty();
           for (var i = 0; i < list.length; i++) {
@@ -97,6 +100,21 @@
             $("#ulist").append(string);
           }
         });
+
+        //load chat messages on connection
+        
+        socket.on("chatmsg push", function(array){
+          if(msgReceived = false){
+            for(var i = 0; i < array.length; i++){
+              var text = array[i];
+              $("#messages").append($("<li>").text(text));
+              window.scrollTo(0, document.body.scrollHeight);
+              msgReceived = true;
+            }
+          }
+
+        });
+
         //request userlist from server
         socket.emit("userlist request");
       });

@@ -16,8 +16,16 @@ console.log("server connected")
 //const db = client.db("test");
 */
 var port = process.env.PORT || 12000;
+
+//deprecated
 var userArray = [];
+
+//array of users
 var userNameArray = [];
+
+//array of messages
+var msgArray = ["besked", "test"];
+
 
 app.get('/', function(req, res){
   //push user to array on page request
@@ -31,6 +39,7 @@ io.on('connection', function(socket){
 
  var username = null;
  io.emit("userlist push", userNameArray);
+ 
 
 
 
@@ -112,14 +121,18 @@ io.on('connection', function(socket){
   socket.on('chat message', function(msg){
   	if(username == null){
   		username = msg;
-  		msg = username + " has connected";
+      var d = new Date();
+
+  		msg = d.toLocaleTimeString() + ": " + username + " has connected";
   		userNameArray.push(username);
   		io.emit("userlist push", userNameArray);
   		io.emit("chat message", msg);
+      io.emit("chatmsg push", msgArray); 
   	}else{
   		var d = new Date();
   		var clientIP = userIP;
   		msg = d.toLocaleTimeString() + ":  " + username + ": " + msg;
+      msgArray.push(msg);
     	io.emit('chat message', msg);
     	}
 
@@ -130,7 +143,8 @@ io.on('connection', function(socket){
     
     //logging disconnection
     var d = new Date();
-
+    var discMsg = d.toLocaleTimeString() + ": " + username + " Has disconnected";
+    io.emit("chat message", discMsg);
   	fs.appendFile("log.txt", d.toLocaleTimeString() + ": 	User disconnected: 		" + userIP + "\n", function(err){
   	if(err){
   		console.log("error while logging")
